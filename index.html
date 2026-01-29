@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快樂單字大冒險</title>
+    <!-- Google Fonts for a rounded, friendly look -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #E0F7FA;
+            --card-bg: #FFFFFF;
+            --primary: #FFB74D;
+            /* Orange */
+            --accent: #4DD0E1;
+            /* Cyan */
+            --text: #5D4037;
+            /* Brown text looks warmer */
+            --success: #AED581;
+            /* Light Green */
+            --error: #FF8A80;
+            /* Light Red */
+            --btn-shadow: #F57C00;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.8) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.8) 0%, transparent 20%),
+                radial-gradient(#B2EBF2 20%, transparent 20%),
+                radial-gradient(#B2EBF2 20%, transparent 20%);
+            background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
+            background-position: 0 0, 0 0, 0 0, 25px 25px;
+            font-family: 'Fredoka', 'Varela Round', 'Comic Sans MS', cursive, sans-serif;
+            color: var(--text);
+            overflow: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 500px;
+            background: var(--card-bg);
+            border: 8px solid #FFF;
+            border-radius: 40px;
+            padding: 30px;
+            box-shadow:
+                0 15px 0 rgba(77, 208, 225, 0.4),
+                0 25px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .mascot-deco {
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 80px;
+            filter: drop-shadow(0 5px 0 rgba(0, 0, 0, 0.1));
+            animation: bounce 3s infinite ease-in-out;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: var(--accent);
+            text-shadow: 2px 2px 0 #FFF, 4px 4px 0 rgba(0, 0, 0, 0.1);
+            margin: 40px 0 20px;
+            font-weight: 700;
+        }
+
+        .progress-container {
+            background: #F0F0F0;
+            height: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+            border: 3px solid #FFF;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: repeating-linear-gradient(45deg,
+                    #4DD0E1,
+                    #4DD0E1 10px,
+                    #26C6DA 10px,
+                    #26C6DA 20px);
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: 10px;
+        }
+
+        .word-card {
+            background: #FFF9C4;
+            /* Light Yellow */
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            border: 4px dashed #FFEE58;
+            transform: rotate(-2deg);
+            animation: wiggly 0.5s ease-in-out;
+        }
+
+        .word-display {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #F57F17;
+            text-shadow: 2px 2px 0 #FFF;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .option-btn {
+            background: #FFF;
+            border: 3px solid #E0E0E0;
+            border-bottom-width: 8px;
+            padding: 15px;
+            border-radius: 20px;
+            color: var(--text);
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            position: relative;
+            top: 0;
+            font-weight: 600;
+        }
+
+        .option-btn:hover {
+            border-color: var(--accent);
+            background: #E0F7FA;
+            transform: translateY(-2px);
+        }
+
+        .option-btn:active {
+            top: 5px;
+            border-bottom-width: 3px;
+            transform: translateY(0);
+        }
+
+        .option-btn.correct {
+            background: #DCEDC8;
+            border-color: #8BC34A;
+            border-bottom-color: #689F38;
+            color: #33691E;
+            animation: pop 0.3s;
+        }
+
+        .option-btn.wrong {
+            background: #FFEBEE;
+            border-color: #EF5350;
+            border-bottom-color: #C62828;
+            color: #B71C1C;
+            animation: shake 0.4s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            50% {
+                transform: translateX(-50%) translateY(-15px);
+            }
+        }
+
+        @keyframes wiggly {
+            0% {
+                transform: rotate(-2deg);
+            }
+
+            25% {
+                transform: rotate(2deg);
+            }
+
+            50% {
+                transform: rotate(-1deg);
+            }
+
+            75% {
+                transform: rotate(1deg);
+            }
+
+            100% {
+                transform: rotate(-2deg);
+            }
+        }
+
+        @keyframes pop {
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        /* Result Screen */
+        .score-star {
+            font-size: 6rem;
+            margin: 20px 0;
+            animation: spin-slow 10s infinite linear;
+            display: inline-block;
+        }
+
+        @keyframes spin-slow {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .btn-restart {
+            background: var(--primary);
+            color: #FFF;
+            border: none;
+            border-bottom: 6px solid #F57C00;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            margin-top: 20px;
+        }
+
+        .btn-restart:hover {
+            transform: scale(1.05);
+            background: #FFB74D;
+        }
+
+        .btn-restart:active {
+            transform: scale(0.95);
+            border-bottom-width: 2px;
+            margin-top: 24px;
+        }
+
+        /* Particles */
+        .confetti {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            animation: rain 3s linear forwards;
+            z-index: 100;
+        }
+
+        @keyframes rain {
+            0% {
+                transform: translateY(-10vh) translateX(0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(110vh) translateX(20px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="mascot-deco">🦄</div>
+        <h1>快樂單字大冒險</h1>
+
+        <div id="quiz-ui">
+            <div class="progress-container">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+
+            <div id="quiz-content">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <div id="result-ui" style="display: none;">
+            <div class="score-star">⭐</div>
+            <h2 style="font-size: 2rem; color: var(--text); margin: 0;">太棒了！</h2>
+            <p style="font-size: 1.2rem; color: #8D6E63;">你的神奇分數是：<span id="score-val"
+                    style="font-weight:bold; color:var(--accent); font-size:1.5rem;">0</span> 分</p>
+            <button class="btn-restart" onclick="initGame()">再玩一次 🚀</button>
+        </div>
+    </div>
+
+    <script>
+        let vocabulary = [];
+        let currentIndex = 0;
+        let score = 0;
+        let canAnswer = true;
+
+        // Random mascot rotation
+        const mascots = ['🦄', '🐼', '🐨', '🐯', '🦁', '🐸'];
+
+        async function initGame() {
+            // Reset state
+            currentIndex = 0;
+            score = 0;
+            canAnswer = true;
+            document.getElementById('quiz-ui').style.display = 'block';
+            document.getElementById('result-ui').style.display = 'none';
+            document.querySelector('.mascot-deco').innerText = mascots[Math.floor(Math.random() * mascots.length)];
+            document.getElementById('progress').style.width = '0%';
+
+            // Load data if not loaded
+            if (vocabulary.length === 0) {
+                try {
+                    const response = await fetch('vocabulary.csv');
+                    if (!response.ok) throw new Error('Failed to load CSV');
+                    const text = await response.text();
+                    vocabulary = parseCSV(text);
+                    // Shuffle vocabulary for new game
+                    vocabulary = shuffleArray(vocabulary);
+                } catch (e) {
+                    console.error(e);
+                    document.getElementById('quiz-content').innerHTML = `<p style="color:red">無法讀取題庫！請確認是否使用 start_quiz.bat 開啟。</p>`;
+                    return;
+                }
+            } else {
+                vocabulary = shuffleArray(vocabulary);
+            }
+
+            // Pick top 10 for this round (or all if less than 10)
+            // For a longer game, we can use the whole list. Let's use 10 for a session.
+            // But we need the whole list for distractors.
+            // Let's just create a session array.
+            sessionVocabulary = vocabulary.slice(0, 10);
+
+            renderQuestion();
+        }
+
+        let sessionVocabulary = [];
+
+        function parseCSV(text) {
+            const lines = text.trim().split('\n');
+            const data = [];
+            // Skip header if exists (check first line)
+            let start = 0;
+            if (lines[0].includes('word') || lines[0].includes('translation')) start = 1;
+
+            for (let i = start; i < lines.length; i++) {
+                const [word, translation] = lines[i].split(',').map(s => s.trim());
+                if (word && translation) {
+                    data.push({ word, translation });
+                }
+            }
+            return data;
+        }
+
+        function shuffleArray(array) {
+            const newArr = [...array];
+            for (let i = newArr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+            }
+            return newArr;
+        }
+
+        function getDistractors(correctTranslation) {
+            // Get 3 random others
+            const others = vocabulary.filter(v => v.translation !== correctTranslation);
+            const shuffled = shuffleArray(others);
+            return shuffled.slice(0, 3).map(v => v.translation);
+        }
+
+        function renderQuestion() {
+            if (currentIndex >= sessionVocabulary.length) {
+                showResult();
+                return;
+            }
+
+            const data = sessionVocabulary[currentIndex];
+            const content = document.getElementById('quiz-content');
+            const progress = ((currentIndex) / sessionVocabulary.length) * 100;
+
+            document.getElementById('progress').style.width = `${progress}%`;
+
+            // Generate Options
+            const distractors = getDistractors(data.translation);
+            const options = shuffleArray([...distractors, data.translation]);
+
+            let optionsHtml = '';
+            options.forEach(opt => {
+                optionsHtml += `<button class="option-btn" onclick="checkAnswer(this, '${opt}')">${opt}</button>`;
+            });
+
+            content.innerHTML = `
+                <div class="word-card">
+                    <div class="word-display">${data.word}</div>
+                </div>
+                <div class="options-grid">
+                    ${optionsHtml}
+                </div>
+            `;
+        }
+
+        function checkAnswer(btn, selected) {
+            if (!canAnswer) return;
+            canAnswer = false;
+
+            const data = sessionVocabulary[currentIndex];
+            const isCorrect = selected === data.translation;
+            const buttons = document.querySelectorAll('.option-btn');
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                btn.innerHTML = `${selected} ✅`;
+                score++;
+                createParticles(btn.getBoundingClientRect().left + 50, btn.getBoundingClientRect().top);
+            } else {
+                btn.classList.add('wrong');
+                btn.innerHTML = `${selected} ❌`;
+                buttons.forEach(b => {
+                    if (b.innerText === data.translation) {
+                        b.classList.add('correct');
+                        b.innerHTML = `${data.translation} ✅`;
+                    }
+                });
+            }
+
+            setTimeout(() => {
+                currentIndex++;
+                canAnswer = true;
+                renderQuestion();
+            }, 1200);
+        }
+
+        function showResult() {
+            document.getElementById('quiz-ui').style.display = 'none';
+            document.getElementById('result-ui').style.display = 'block';
+            document.getElementById('progress').style.width = '100%';
+
+            const finalScore = Math.round((score / sessionVocabulary.length) * 100);
+            document.getElementById('score-val').textContent = finalScore;
+
+            if (finalScore >= 80) fullCelebration();
+        }
+
+        function createParticles(x, y) {
+            for (let i = 0; i < 10; i++) {
+                const p = document.createElement('div');
+                p.classList.add('confetti');
+                p.textContent = ['⭐', '✨', '🎈'][Math.floor(Math.random() * 3)];
+                p.style.fontSize = '20px';
+                p.style.left = (x + (Math.random() - 0.5) * 50) + 'px';
+                p.style.top = (y + (Math.random() - 0.5) * 50) + 'px';
+                p.style.animation = 'rain 1s ease-out forwards';
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 1000);
+            }
+        }
+
+        function fullCelebration() {
+            const colors = ['#FFCDD2', '#F8BBD0', '#E1BEE7', '#D1C4E9', '#C5CAE9', '#BBDEFB', '#B3E5FC', '#B2EBF2', '#B2DFDB', '#C8E6C9', '#DCEDC8', '#F0F4C3', '#FFF9C4', '#FFECB3', '#FFE0B2', '#FFCCBC'];
+
+            let interval = setInterval(() => {
+                const p = document.createElement('div');
+                p.classList.add('confetti');
+                p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                p.style.left = Math.random() * 100 + 'vw';
+                p.style.width = Math.random() * 20 + 10 + 'px';
+                p.style.height = p.style.width;
+                p.style.zIndex = 200;
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 3000);
+            }, 100);
+
+            setTimeout(() => clearInterval(interval), 3000);
+        }
+
+        initGame();
+    </script>
+</body>
+
+</html>
