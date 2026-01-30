@@ -465,6 +465,7 @@
         let canAnswer = true;
         let currentUser = "玩家";
         let sessionVocabulary = [];
+        let wrongWords = [];
 
         // Random mascot rotation
         const mascots = ['🦄', '🐼', '🐨', '🐯', '🦁', '🐸'];
@@ -510,6 +511,7 @@
             currentIndex = 0;
             score = 0;
             canAnswer = true;
+            wrongWords = [];
             document.getElementById('progress').style.width = '0%';
 
             showScreen('quiz-ui');
@@ -627,6 +629,10 @@
             } else {
                 btn.classList.add('wrong');
                 btn.innerHTML = `${selected} ❌`;
+
+                // Track mistake
+                wrongWords.push(`${data.word} (${data.translation})`);
+
                 buttons.forEach(b => {
                     if (b.innerText === data.translation) {
                         b.classList.add('correct');
@@ -666,7 +672,8 @@
                 name: name,
                 score: percentage,
                 date: dateStr,
-                timestamp: new Date().getTime()
+                timestamp: new Date().getTime(),
+                mistakes: wrongWords.join('; ')
             };
 
             let history = JSON.parse(localStorage.getItem('vocab_scores') || '[]');
@@ -704,10 +711,13 @@
             }
 
             // CSV Header
-            let csvContent = "\uFEFF名字,分數,日期,時間戳記\n"; // \uFEFF for BOM (Excel compatibility)
+            let csvContent = "\uFEFF名字,分數,日期,錯誤單字\n"; // \uFEFF for BOM (Excel compatibility)
 
             history.forEach(row => {
-                csvContent += `${row.name},${row.score},${row.date},${row.timestamp}\n`;
+                // Ensure mistakes exists for old records
+                const mistakes = row.mistakes ? row.mistakes : "";
+                // Handle commas in mistakes by wrapping in quotes if necessary, though we used semicolons
+                csvContent += `${row.name},${row.score},${row.date},"${mistakes}"\n`;
             });
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
