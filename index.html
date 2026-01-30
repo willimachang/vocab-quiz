@@ -284,6 +284,24 @@
                 opacity: 0;
             }
         }
+
+        .btn-speak {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 2rem;
+            margin-left: 10px;
+            vertical-align: middle;
+            transition: transform 0.2s;
+        }
+
+        .btn-speak:hover {
+            transform: scale(1.2);
+        }
+
+        .btn-speak:active {
+            transform: scale(0.9);
+        }
     </style>
 </head>
 
@@ -392,6 +410,8 @@
             return shuffled.slice(0, 3).map(v => v.translation);
         }
 
+
+
         function renderQuestion() {
             if (currentIndex >= sessionVocabulary.length) {
                 showResult();
@@ -415,12 +435,25 @@
 
             content.innerHTML = `
                 <div class="word-card">
-                    <div class="word-display">${data.word}</div>
+                    <div class="word-display">
+                        ${data.word}
+                        <button class="btn-speak" onclick="speakWord('${data.word}')" title="發音">🔊</button>
+                    </div>
                 </div>
                 <div class="options-grid">
                     ${optionsHtml}
                 </div>
             `;
+
+            // Auto-speak when question loads (optional, maybe nice?)
+            // speakWord(data.word); 
+        }
+
+        function speakWord(word) {
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = 'en-US'; // Set to English
+            utterance.rate = 0.8; // Slightly slower for clarity
+            window.speechSynthesis.speak(utterance);
         }
 
         function checkAnswer(btn, selected) {
