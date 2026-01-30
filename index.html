@@ -450,7 +450,11 @@
             <div style="margin-top: 20px;">
                 <button class="btn-primary" onclick="showLogin()">返回 ↩️</button>
             </div>
-            <button class="btn-link" style="color: #999; font-size: 0.8rem;" onclick="clearHistory()">清除所有紀錄</button>
+            <div style="margin-top: 10px;">
+                <button class="btn-link" onclick="exportScores()">📥 匯出成績 (CSV)</button>
+                <button class="btn-link" style="color: #999; font-size: 0.8rem; margin-left: 15px;"
+                    onclick="clearHistory()">清除所有紀錄</button>
+            </div>
         </div>
     </div>
 
@@ -690,6 +694,32 @@
                 `;
                 tbody.appendChild(tr);
             });
+        }
+
+        function exportScores() {
+            const history = JSON.parse(localStorage.getItem('vocab_scores') || '[]');
+            if (history.length === 0) {
+                alert("目前沒有紀錄可以匯出喔！");
+                return;
+            }
+
+            // CSV Header
+            let csvContent = "\uFEFF名字,分數,日期,時間戳記\n"; // \uFEFF for BOM (Excel compatibility)
+
+            history.forEach(row => {
+                csvContent += `${row.name},${row.score},${row.date},${row.timestamp}\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+
+            link.setAttribute("href", url);
+            link.setAttribute("download", `vocabulary_scores_${new Date().toISOString().slice(0, 10)}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function clearHistory() {
