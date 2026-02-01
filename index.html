@@ -383,6 +383,48 @@
         .leaderboard-table tr:last-child td {
             border-radius: 0 0 5px 5px;
         }
+
+        /* Media Queries for Mobile */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                width: 92%;
+                border-width: 5px;
+            }
+
+            .mascot-deco {
+                font-size: 60px;
+                top: -45px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+                margin-top: 25px;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .word-card {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+
+            .word-display {
+                font-size: 2.5rem;
+            }
+
+            .option-btn {
+                padding: 12px;
+                font-size: 1.2rem;
+            }
+
+            .btn-primary {
+                font-size: 1.3rem;
+                padding: 12px 30px;
+            }
+        }
     </style>
 </head>
 
